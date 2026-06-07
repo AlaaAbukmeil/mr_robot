@@ -1,0 +1,58 @@
+[package]
+name        = "pico-blink"
+version     = "0.1.0"
+edition     = "2021"
+
+# Disable the default test/bench harnesses — they require std and can't
+# run on bare metal. If you ever want host-side unit tests, add them as
+# a separate crate in this workspace.
+[[bin]]
+name  = "pico-blink"
+test  = false
+bench = false
+
+# ── Dependencies ──────────────────────────────────────────────────────────────
+# Versions here are pinned to a set known to build together.
+[dependencies]
+
+# rp-pico is the Board Support Package (BSP) for the Raspberry Pi Pico.
+# It re-exports rp2040-hal (the Hardware Abstraction Layer) and provides
+# named pin aliases that match the Pico's silkscreen (e.g. `pins.led`
+# maps to GPIO 25, the onboard LED on a standard Pico).
+rp-pico = "0.9"
+
+# cortex-m provides CPU-level primitives for Cortex-M microcontrollers:
+# interrupt enable/disable, the SysTick delay timer, etc.
+# `critical-section-single-core` provides the critical-section
+# implementation (interrupt masking) that the HAL internals require.
+cortex-m = { version = "0.7", features = ["critical-section-single-core"] }
+
+# cortex-m-rt ("runtime") provides the #[entry] macro and startup code:
+# it initialises BSS/data sections and sets up the vector table before
+# handing control to our entry function.
+cortex-m-rt = "0.7"
+
+# embedded-hal defines hardware-agnostic traits (OutputPin, DelayMs, …).
+# By programming against these traits, drivers are portable across boards.
+# `unproven` enables extra traits that rp2040-hal uses internally.
+embedded-hal = { version = "0.2.7", features = ["unproven"] }
+
+# panic-halt: the simplest possible panic handler — on panic, spin forever.
+# On bare metal there is no terminal to print to, so this is the safe
+# default. A later phase will swap this for panic-probe for debugging.
+panic-halt = "0.2"
+
+# ── Compiler profiles ─────────────────────────────────────────────────────────
+
+[profile.dev]
+# With opt-level = 0 (the Rust default for dev) the compiler can emit
+# very large stack frames that overflow the RP2040's 264 KB SRAM.
+# Level 1 is the conventional embedded baseline.
+opt-level = 1
+
+[profile.release]
+opt-level     = "z"   # optimise for binary SIZE ("z" = smallest possible)
+lto           = true  # Link-Time Optimisation — shrinks binary further
+codegen-units = 1     # required for LTO to work correctly
+debug         = 2     # keep debug symbols so probe-rs (added later) can
+                      # show stack traces even from release builds

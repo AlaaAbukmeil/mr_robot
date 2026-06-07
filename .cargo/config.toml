@@ -1,0 +1,40 @@
+# ── Default build target ──────────────────────────────────────────────────────
+#
+# The RP2040 has a dual-core Cortex-M0+ CPU.
+# `thumbv6m-none-eabi` is the Rust target triple for Cortex-M0/M0+:
+#   thumb  → Thumb-2 ISA (compact 16/32-bit instructions used by all Cortex-M)
+#   v6m    → ARMv6-M profile (Cortex-M0 / M0+)
+#   none   → no operating system (bare metal)
+#   eabi   → Embedded ABI (calling convention for ARM bare metal)
+#
+# Setting it here means you can type `cargo build` without spelling out
+# `--target thumbv6m-none-eabi` every time.
+[build]
+target = "thumbv6m-none-eabi"
+
+# ── Target-specific settings ──────────────────────────────────────────────────
+[target.thumbv6m-none-eabi]
+
+# runner — the command `cargo run` executes AFTER a successful build.
+#
+# `elf2uf2-rs -d` does two things:
+#   1. Converts the ELF binary output by the linker to .uf2 format.
+#      (UF2 = USB Flashing Format, designed for drag-and-drop flashing.)
+#   2. The `-d` (deploy) flag locates the first `RPI-RP2` mass-storage
+#      device (your Pico in BOOTSEL mode) and copies the .uf2 onto it.
+#
+# Install it once with: cargo install elf2uf2-rs --locked
+runner = "elf2uf2-rs -d"
+
+# rustflags — extra flags forwarded to rustc / the linker for this target.
+rustflags = [
+    # --nmagic tells the linker NOT to page-align sections.
+    # Page alignment wastes space in flash; on a 2 MB device every byte counts.
+    "-C", "link-arg=--nmagic",
+
+    # -Tlink.x selects the cortex-m-rt linker script.
+    # link.x sets up the reset vector, exception table, and memory layout.
+    # It includes `memory.x` automatically — rp2040-hal ships memory.x via
+    # its build script, so you do NOT need a local memory.x in this project.
+    "-C", "link-arg=-Tlink.x",
+]

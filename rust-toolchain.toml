@@ -1,0 +1,12 @@
+# Pins the Rust toolchain so every developer and CI job gets the same compiler.
+#
+# "stable" always resolves to the latest stable release.  If you need strict
+# reproducibility (e.g. for a production product), replace it with a specific
+# version string like "1.78.0".
+#
+# The `targets` list pre-installs the cross-compilation target so you don't
+# have to run `rustup target add thumbv6m-none-eabi` manually on each machine
+# (rustup reads this file and installs missing components automatically).
+[toolchain]
+channel = "stable"
+targets = ["thumbv6m-none-eabi"]
