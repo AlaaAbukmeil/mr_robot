@@ -75,10 +75,6 @@ use rp_pico::XOSC_CRYSTAL_FREQ;
 // resolve the method call.
 use embedded_hal::digital::v2::OutputPin;
 
-// `DelayMs` is an embedded-hal trait that provides `delay_ms(ms: u32)`.
-// `cortex_m::delay::Delay` implements this trait using the SysTick timer.
-use embedded_hal::blocking::delay::DelayMs;
-
 // ── Entry point ───────────────────────────────────────────────────────────────
 
 /// The program entry point.

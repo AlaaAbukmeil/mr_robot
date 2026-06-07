@@ -25,7 +25,7 @@ rp-pico = "0.9"
 # interrupt enable/disable, the SysTick delay timer, etc.
 # `critical-section-single-core` provides the critical-section
 # implementation (interrupt masking) that the HAL internals require.
-cortex-m = { version = "0.7", features = ["critical-section-single-core"] }
+cortex-m = "0.7"
 
 # cortex-m-rt ("runtime") provides the #[entry] macro and startup code:
 # it initialises BSS/data sections and sets up the vector table before
