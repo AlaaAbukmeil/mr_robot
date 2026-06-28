@@ -42,6 +42,14 @@ embedded-hal = { version = "0.2.7", features = ["unproven"] }
 # default. A later phase will swap this for panic-probe for debugging.
 panic-halt = "0.2"
 
+# USB CDC serial.  usb-device 0.3.x is already a transitive dep (rp-pico →
+# rp2040-hal → usb-device); usbd-serial 0.2 targets that same 0.3 series.
+# heapless 0.8 is also already in the lock (transitive); we declare it here
+# so we can use heapless::String directly in main.rs.
+usb-device  = "0.3"   # already in the lock as a transitive dep; declared here to use directly
+usbd-serial = "0.2"
+heapless    = "0.8"
+
 # ── Compiler profiles ─────────────────────────────────────────────────────────
 
 [profile.dev]
